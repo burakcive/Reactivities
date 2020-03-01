@@ -1,40 +1,73 @@
-import React, { Component } from 'react';
-import { Header, Icon, List } from 'semantic-ui-react';
+import React, { useState, useEffect, Fragment } from 'react';
+import { Container } from 'semantic-ui-react';
 import axios from 'axios';
 import { IActivity } from '../models/activity';
+import NavBar from '../features/nav/NavBar';
+import ActivityDashboard from '../features/activities/dashboard/ActivityDashboard';
 
-interface IState {
-  activities: IActivity[];
-}
+const App = () => {
+  const [activities, setActivities] = useState<IActivity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(null);
+  const [editMode, setEditMode] = useState(false);
 
-class App extends Component<{}, IState> {
-  readonly state: IState = {
-    activities: []
-  };
+  const handleSelectActivity = (id: string) => {
+    setSelectedActivity(activities.filter(a => a.id === id)[0]);
+    setEditMode(false);
+  }
 
-  componentDidMount() {
+  const handleOpenCreateForm = () => {
+    setSelectedActivity(null);
+    setEditMode(true);
+  }
+
+  const handleCreateActivity = (activity: IActivity) => {
+    setActivities([...activities, activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  }
+
+  const handleEditActivity = (activity: IActivity) => {
+    setActivities([...activities.filter(a => a.id !== activity.id), activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  }
+
+  const handleDeleteActivity = (id: string) => {
+    setActivities([...activities.filter(a => a.id !== id)]);
+  }
+
+  // componentdidmount equivalent
+  useEffect(() => {
     axios.get<IActivity[]>('https://localhost:44393/api/activities').then(response => {
-      this.setState({
-        activities: response.data
-      });
-    });
-  }
+      let activities:IActivity[] = [];
 
-  render() {
-    return (
-      <div>
-        <Header as='h2'>
-          <Icon name='users' />
-          <Header.Content>Reactivities</Header.Content>
-        </Header>
-        <List>
-          {this.state.activities.map((activity: IActivity) => (
-            <List.Item key={activity.id}>{activity.title}</List.Item>
-          ))}
-        </List>
-      </div>
-    );
-  }
+      response.data.forEach(act => {
+        act.date = act.date.split('.')[0];
+        activities.push(act);
+      })
+
+      setActivities(activities)
+    });
+  }, []);
+
+  return (
+    <Fragment>
+      <NavBar openCreateForm={handleOpenCreateForm}></NavBar>
+      <Container style={{ marginTop: '6em' }}>
+        <ActivityDashboard
+          activities={activities}
+          selectActivity={handleSelectActivity}
+          selectedActivity={selectedActivity}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          setSelectedActivity={setSelectedActivity}
+          createActivity={handleCreateActivity}
+          editActivity={handleEditActivity}
+          deleteActivity={handleDeleteActivity}
+        />
+      </Container>
+    </Fragment>
+  );
 }
 
 export default App;

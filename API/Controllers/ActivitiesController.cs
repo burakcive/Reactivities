@@ -10,13 +10,11 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActivitiesController : ControllerBase
+    public class ActivitiesController : AppBaseController
     {
-        private readonly IMediator _mediator;
 
-        public ActivitiesController(IMediator mediator)
+        public ActivitiesController(IMediator mediator) : base(mediator)
         {
-            _mediator = mediator;
         }
 
         [HttpGet]
