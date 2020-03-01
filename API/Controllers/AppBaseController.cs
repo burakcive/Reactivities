@@ -16,6 +16,5 @@ namespace API.Controllers
         {
             _mediator = mediator;
         }
-
     }
 }
