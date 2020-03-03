@@ -22,7 +22,7 @@ class ActivityStore {
 
         try {
             const activities = await agent.Activities.list();
-            runInAction(() => {
+            runInAction('loading activities', () => {
                 activities.forEach(activity => {
                     activity.date = activity.date.split('.')[0];
                     //this.activities.push(activity);
@@ -35,10 +35,9 @@ class ActivityStore {
             console.log(error);
         }
         finally {
-            runInAction(() => {
+            runInAction('load activities error', () => {
                 this.loadingInitial = false;
             })
-
         }
     };
 
@@ -47,13 +46,17 @@ class ActivityStore {
 
         try {
             await agent.Activities.create(activity);
-            //this.activities.push(activity);
-            this.activityRegistry.set(activity.id, activity);
-            this.editMode = false;
-            this.submitting = false;
+            runInAction('creating activity', () => {
+                this.activityRegistry.set(activity.id, activity);
+                this.editMode = false;
+                this.submitting = false;
+            })
+
         } catch (error) {
+            runInAction('create activity error', () => {
+                this.submitting = false;
+            })
             console.log(error);
-            this.submitting = false;
         }
     }
 
@@ -61,13 +64,18 @@ class ActivityStore {
         this.submitting = true;
         try {
             await agent.Activities.update(activity);
-            this.activityRegistry.set(activity.id, activity);
-            this.selectedActivity = activity;
-            this.editMode = false;
-            this.submitting = false;
+            runInAction('editing activity', () => {
+                this.activityRegistry.set(activity.id, activity);
+                this.selectedActivity = activity;
+                this.editMode = false;
+                this.submitting = false;
+            })
+
         } catch (error) {
+            runInAction('error editing activity', () => {
+                this.submitting = false;
+            })
             console.log(error);
-            this.submitting = false;
         }
     }
 
@@ -76,13 +84,18 @@ class ActivityStore {
         this.target = event.currentTarget.name;
         try {
             await agent.Activities.delete(id);
-            this.activityRegistry.delete(id);
-            this.submitting = false;
-            this.target = "";
+            runInAction('deleting activity', () => {
+                this.activityRegistry.delete(id);
+                this.submitting = false;
+                this.target = "";
+            })
+
         } catch (error) {
+            runInAction('error deleting activity', () => {
+                this.submitting = false;
+                this.target = "";
+            })
             console.log(error);
-            this.submitting = false;
-            this.target = "";
         }
     }
 
