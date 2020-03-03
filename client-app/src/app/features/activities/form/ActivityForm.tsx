@@ -1,17 +1,18 @@
-import React, { useState, FormEvent } from 'react'
+import React, { useState, FormEvent, useContext } from 'react'
 import { Segment, Form, Button } from 'semantic-ui-react'
 import { IActivity } from '../../../models/activity'
-import {v4 as uuid} from 'uuid'
+import { v4 as uuid } from 'uuid'
+import ActivityStore from '../../../stores/activityStore'
 
 interface IProps {
-    setEditMode: (editMode: boolean) => void;
     activity: IActivity;
-    createActivity: (activity: IActivity) => void;
-    editActivity: (activity: IActivity) => void;
-    submitting: boolean;
 }
 
-export const ActivityForm: React.FC<IProps> = ({ setEditMode, activity: initialFormState, createActivity, editActivity,submitting }) => {
+export const ActivityForm: React.FC<IProps> = ({ activity: initialFormState }) => {
+    const activityStore = useContext(ActivityStore);
+    const { createActivity, editActivity, submitting, cancelFormOpen } = activityStore;
+
+
     const initializeForm = () => {
         if (initialFormState) {
             return initialFormState;
@@ -39,8 +40,7 @@ export const ActivityForm: React.FC<IProps> = ({ setEditMode, activity: initialF
     };
 
     const handleSubmit = () => {
-        if(activity.id.length ===0)
-        {
+        if (activity.id.length === 0) {
             let newActivity =
             {
                 ...activity,
@@ -49,7 +49,7 @@ export const ActivityForm: React.FC<IProps> = ({ setEditMode, activity: initialF
 
             createActivity(newActivity);
         }
-        else{
+        else {
             editActivity(activity);
         }
     }
@@ -64,7 +64,7 @@ export const ActivityForm: React.FC<IProps> = ({ setEditMode, activity: initialF
                 <Form.Input onChange={handleInputChange} name="city" placeholder="City" value={activity.city} />
                 <Form.Input onChange={handleInputChange} name="venue" placeholder="Venue" value={activity.venue} />
                 <Button loading={submitting} floated="right" positive type="submit" content="Submit"></Button>
-                <Button onClick={() => setEditMode(false)} floated="left" type="button" content="Cancel"></Button>
+                <Button onClick={cancelFormOpen} floated="left" type="button" content="Cancel"></Button>
             </Form>
         </Segment>
     )
