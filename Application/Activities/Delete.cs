@@ -1,8 +1,10 @@
-﻿using Domain;
+﻿using Application.Errors;
+using Domain;
 using MediatR;
 using Persistence;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +32,7 @@ namespace Application.Activities
 
                 if (activity == null)
                 {
-                    throw new ArgumentNullException(nameof(activity) + " cannot be found");
+                    throw new RestException(HttpStatusCode.NotFound, new { activity = nameof(activity) + " cannot be found" });
                 }
 
                 _context.Remove(activity);
