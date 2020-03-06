@@ -15,23 +15,6 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({ match, hist
     const { createActivity, editActivity, submitting,
         activity: initialFormState, loadActivity, clearActivity } = activityStore;
 
-    const initializeForm = () => {
-        if (initialFormState) {
-            return initialFormState;
-        }
-        else {
-            return {
-                id: "",
-                title: "",
-                category: "",
-                description: "",
-                date: "",
-                city: "",
-                venue: ""
-            }
-        }
-    };
-
     const [activity, setActivity] = useState<IActivity>({
         id: "",
         title: "",
