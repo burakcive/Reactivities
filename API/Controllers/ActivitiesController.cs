@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using Application.Activities;
 using Domain;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-
     public class ActivitiesController : AppBaseController
     {
-
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> List()
         {
